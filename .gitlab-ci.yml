@@ -1,0 +1,9 @@
+stages:
+  - vm_deploy
+
+vm_deploy_job:
+  stage: vm_deploy
+  script:
+    - node app.js
+
+
