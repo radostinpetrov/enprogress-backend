@@ -1,12 +1,28 @@
-const http = require("http");
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
 
-const server = http.createServer((req, res) => {
-	if (req.url === "/") {
-		res.write("Hello World!");
-		res.end();
-	}
-});
+// used for ooking the query functions
+const db = require('./queries')
 
-server.listen(3000);
+app.use(bodyParser.json());
+app.use(
+	bodyParser.urlencoded({
+		extended: true,
+	})
+)
 
-console.log("Listening on port 3000...");
+app.get('/', (request, response) => {
+	response.json({ info: 'Node.js, Express, and Postgres API' })
+})
+
+  app.listen(port, () => {
+	console.log(`App running on port ${port}.`)
+})
+
+app.get('/users', db.getUsers)
+app.get('/users/:id', db.getUserById)
+app.post('/users', db.createUser)
+app.put('/users/:id', db.updateUser)
+app.delete('/users/:id', db.deleteUser)
