@@ -1,2 +1,5 @@
+FROM node:current
+COPY ./app.js ./
 RUN apt-get -y update && apt-get -y install nodejs
-RUN node app.js
+CMD [ "node", "app.js" ]
+
