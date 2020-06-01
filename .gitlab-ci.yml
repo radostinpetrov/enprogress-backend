@@ -1,5 +1,18 @@
+image: $DOCKER_IMAGE:latest
+
 stages:
+  - build_docker_image
   - vm_deploy
+
+variables:
+  DOCKER_IMAGE: gitlab.doc.ic.ac.uk:4567/g1927129/enprogress-backend
+
+build_docker_image_job:
+  stage: build_docker_image
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
 
 vm_deploy_job:
   stage: vm_deploy
