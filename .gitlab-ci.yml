@@ -4,6 +4,8 @@ stages:
 vm_deploy_job:
   stage: vm_deploy
   script:
-    - node app.js
+    - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
+    - screen -S EnProgress -dm node app.js
+
 
 
