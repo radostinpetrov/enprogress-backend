@@ -17,6 +17,8 @@ build_docker_image_job:
 vm_deploy_job:
   stage: vm_deploy
   script:
+    - npm i express
+    - npm i pg
     - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
     - screen -S EnProgress -dm node app.js
 
