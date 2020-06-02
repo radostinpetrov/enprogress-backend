@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
  
-RUN apt-get -y update && apt-get -y install npm 
+RUN apt-get -y update && apt-get -y install nodejs 
  
 COPY . . 
  
