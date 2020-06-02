@@ -1,5 +1,14 @@
-FROM node:current
-COPY ./app.js ./
-RUN apt-get -y update && apt-get -y install nodejs
-CMD [ "node", "app.js" ]
+FROM node:current 
+ 
+RUN mkdir /app 
+WORKDIR /app 
+ 
+COPY package.json 
+COPY package-lock.json 
+ 
+RUN apt-get -y update && apt-get -y install npm 
+ 
+COPY . . 
+ 
+CMD node app.js
 
