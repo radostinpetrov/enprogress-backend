@@ -4,6 +4,43 @@ const pool = new Pool({
   connectionString: connectionString,
 })
 
+const Joi = require('joi')
+
+// Schemas for DB
+const taskSchema = {
+  name: Joi.string().min(3).max(50).required(),
+  percentage: Joi.number().integer().min(0).max(100).required(),
+  subtasks: Joi.array().items(Joi.string().min(3).max(50).required()),
+  subtaskPercentages: Joi.array().items(Joi.number().integer().min(0).max(100).required())
+}
+
+const subtaskSchema = {
+  name: Joi.string().alphanum().min(3).max(100).required(),
+  percentage: Joi.number().integer().min(0).max(100).required(),
+  ordering: Joi.number().integer().min(0).required(),
+  fk_task_id: Joi.number().integer().min(1).required(),
+}
+
+
+// Data validation functions (return true if data valid)
+function validateTask(task, response) {
+  const result = Joi.validate(task, taskSchema)
+  if (result.error) {
+    response.status(400).send(result.error.details[0].message)
+  }
+
+  // TODO CHECK SUM (PERCENTAGES) === 100
+  return (result.error === null);
+}
+
+function validateSubtask(task, response) {
+  const result = Joi.validate(task, subtaskSchema)
+  if (result.error) {
+    response.status(400).send(result.error.details[0].message)
+  }
+  return (result.error === null);
+}
+
 // routes for GET endpoint
 const getUsers = (request, response) => {
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
@@ -67,9 +104,9 @@ const deleteUser = (request, response) => {
 }
 
 
-// TASKS
+// Functions for handling task-related queries
 
-// Viewing tasks
+// Routes for GET reqs
 const getTasks = (request, response) => {
   pool.query('SELECT * FROM tasks ORDER by id ASC', (error, results) => {
     if (error) {
@@ -83,16 +120,16 @@ const getTaskById = (request, response) => {
   const id = parseInt(request.params.id)
 
 
-  pool.query('SELECT * FROM tasks WHERE id = $1', [id], (error, results) => {
+  pool.query('SELECT * FROM tasks WHERE id = $1 ORDER BY id ASC', [id], (error, results) => {
     if (error) {
       throw error
     }
-    // response.status(200).write(JSON.stringify(results.rows)
+    // response.status(200).write(JSON.stringify(results.rows))
     response.status(200).json(results.rows)
 
   })
 
-  // pool.query('SELECT * FROM subtasks WHERE fk_task_id = $1', [id], (error, results) => {
+  // pool.query('SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY id ASC', [id], (error, results) => {
   //   if (error) {
   //     throw error
   //   }
@@ -106,7 +143,7 @@ const getSubTaskById = (request, response) => {
   const id = parseInt(request.params.id)
 
 
-  pool.query('SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY id ASC', [id], (error, results) => {
+  pool.query('SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY ordering ASC', [id], (error, results) => {
     if (error) {
       throw error
     }
@@ -115,37 +152,54 @@ const getSubTaskById = (request, response) => {
   })
 }
 
-// Creating tasks
-
+// Routes for POST reqs
 
 const createTask = (request, response) => {
-  const { name, percentage, subtasks } = request.body
+
+  // Extract data and validate
+  const { name, percentage, subtasks, subtaskPercentages } = request.body
+  if (!(validateTask(request.body, response))) return;
+
+
   pool.query('INSERT INTO tasks (name, percentage) VALUES ($1, $2) RETURNING id', [name, percentage], (error, results) => {
     if (error) {
       throw error
     }
 
+    // Get insertedId and insert subtasks iff successful 
     const insertedId = results.rows[0].id
     for (var i = 0; i < subtasks.length; i++) {
-      const subtask = subtasks[i];
-      pool.query('INSERT INTO subtasks (name, fk_task_id) VALUES ($1, $2)', [subtask, insertedId], (error, results) => {
-        if (error) {
-          throw error
-        }
-      })
+
+      // Extract data and validate
+      const subtask = subtasks[i]
+      const subtaskPercentage = subtaskPercentages[i]
+      if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: insertedId }, subtaskSchema))) return;
+
+      pool.query(
+        'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
+        [subtask, subtaskPercentage, i, insertedId],
+        (error, results) => {
+          if (error) {
+            throw error
+          }
+        })
     }
 
     response.status(201).send(`Task added with ID: ${insertedId}`)
   })
 }
 
-// Updating tasks
-
+// Routes for PUT reqs
 
 const updateTask = (request, response) => {
-  const id = parseInt(request.params.id)
-  const { name, percentage, subtasks } = request.body
 
+  // Extract data and validate
+  const id = parseInt(request.params.id)
+  const { name, percentage, subtasks, subtaskPercentages } = request.body
+  if (!(validateTask(request.body, response))) return;
+
+
+  // Update main task
   pool.query(
     'UPDATE tasks SET name = $1, percentage = $2 WHERE id = $3',
     [name, percentage, id],
@@ -154,26 +208,55 @@ const updateTask = (request, response) => {
         throw error
       }
 
+      // Get old subtasks
       pool.query(
-        'SELECT * FROM subtasks WHERE fk_task_id = $1', [id], (error, subTaskResults) => {
+        'SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY ordering ASC',
+        [id],
+        (error, subTaskResults) => {
           if (error) {
             throw error
           }
 
           for (var i = 0; i < subtasks.length; i++) {
+
+            // Extract subtask data and validate
             const subtask = subtasks[i];
+            const subtaskPercentage = subtaskPercentages[i]
+            if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: id }, subtaskSchema))) return;
+
             if (i < subTaskResults.rowCount) {
-              pool.query('UPDATE subtasks SET name = $1 WHERE name = $2 ', [subtask, subTaskResults.rows[i].name], (error, results) => {
-                if (error) {
-                  throw error
+
+              // Update old subtasks
+              pool.query(
+                'UPDATE subtasks SET percentage = $1 WHERE name = $2 ',
+                [subtaskPercentage, subTaskResults.rows[i].name],
+                (error, results) => {
+                  if (error) {
+                    throw error
+                  }
+                })
+
+              pool.query(
+                'UPDATE subtasks SET name = $1 WHERE name = $2',
+                [subtask, subTaskResults.rows[i].name],
+                (error) => {
+                  if (error) {
+                    throw error
+                  }
                 }
-              })
+              )
             } else {
-              pool.query('INSERT INTO subtasks (name, fk_task_id) VALUES ($1, $2)', [subtask, id], (error, results) => {
-                if (error) {
-                  throw error
-                }
-              })
+
+              // Insert new subtasks
+              pool.query(
+                'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
+                [subtask, subtaskPercentage, i, id],
+                (error, results) => {
+                  if (error) {
+                    console.log("hyaaaaa")
+                    throw error
+                  }
+                })
             }
           }
         }
@@ -184,7 +267,7 @@ const updateTask = (request, response) => {
   )
 }
 
-// Deleting tasks
+// Routes for DELETE reqs
 
 const deleteTask = (request, response) => {
   const id = parseInt(request.params.id)
