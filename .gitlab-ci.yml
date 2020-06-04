@@ -2,7 +2,6 @@ image: $DOCKER_IMAGE:latest
 
 stages:
   - build_docker_image
-  - vm_deploy
   - heroku_deploy
 
 variables:
