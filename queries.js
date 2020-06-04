@@ -21,6 +21,20 @@ const subtaskSchema = {
   fk_task_id: Joi.number().integer().min(1).required(),
 }
 
+const userSchema =  {
+  name: Joi.string().alphanum().min(1).max(50).required(),
+  email: Joi.string().email().max(256).required()
+}
+
+function validateUser(user, response) {
+  const result = Joi.validate(user, userSchema)
+  if (result.error) {
+    response.status(400).send(result.error.details[0].message)
+  }
+
+  return (result.error === null);
+}
+
 
 // Data validation functions (return true if data valid)
 function validateTask(task, response) {
@@ -65,6 +79,7 @@ const getUserById = (request, response) => {
 // routes for POST endpoint
 const createUser = (request, response) => {
   const { name, email } = request.body
+  if (!(validateUser(request.body, response))) return;
 
   pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
     if (error) {
