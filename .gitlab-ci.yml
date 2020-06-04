@@ -3,6 +3,7 @@ image: $DOCKER_IMAGE:latest
 stages:
   - build_docker_image
   - vm_deploy
+  - heroku_deploy
 
 variables:
   DOCKER_IMAGE: gitlab.doc.ic.ac.uk:4567/g1927129/enprogress-backend
@@ -22,5 +23,11 @@ vm_deploy_job:
     - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
     - screen -S EnProgress -dm node app.js
 
+heroku_deploy_job:
+  stage: heroku_deploy
+  script:
+    - dpl --provider=heroku --app=enprogress --api-key=$API_KEY
+  rules:
+    - when: manual
 
 

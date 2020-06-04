@@ -19,4 +19,9 @@ app.post('/users', db.createUser)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 
-module.exports = app;
+app.get('/tasks', db.getTasks)
+app.get('/tasks/:id', db.getTaskById)
+app.get('/tasks/:id/subtasks', db.getSubTaskById)
+app.post('/tasks', db.createTask)
+app.put('/tasks/:id', db.updateTask)
+app.delete('/tasks/:id', db.deleteTask)
