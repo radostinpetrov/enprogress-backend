@@ -22,8 +22,6 @@ vm_deploy_job:
     - npm i pg
     - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
     - screen -S EnProgress -dm node app.js
-  rules:
-    - when: manual
 
 heroku_deploy_job:
   stage: heroku_deploy
