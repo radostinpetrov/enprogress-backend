@@ -173,7 +173,7 @@ const createTask = (request, response) => {
       // Extract data and validate
       const subtask = subtasks[i]
       const subtaskPercentage = subtaskPercentages[i]
-      if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: insertedId }, subtaskSchema))) return;
+      if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: insertedId }, response))) return;
 
       pool.query(
         'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
@@ -222,7 +222,7 @@ const updateTask = (request, response) => {
             // Extract subtask data and validate
             const subtask = subtasks[i];
             const subtaskPercentage = subtaskPercentages[i]
-            if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: id }, subtaskSchema))) return;
+            if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: id }, response))) return;
 
             if (i < subTaskResults.rowCount) {
 
