@@ -2,10 +2,8 @@
   "name": "enprogress-backend",
   "version": "1.0.0",
   "description": "EnProgress App back-end built in Node.js and Express.",
-  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -17,6 +15,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "pg": "^8.2.1",
-    "joi": "^14.3.1"
+    "joi": "^14.3.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "morgan": "~1.9.1"
   }
 }

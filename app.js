@@ -1,25 +1,17 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 
-// used for ooking the query functions
 const db = require('./queries')
 
-app.use(bodyParser.json());
-app.use(
-	bodyParser.urlencoded({
-		extended: true,
-	})
-)
+var app = express();
 
-app.get('/', (request, response) => {
-	response.json({ info: 'Node.js, Express, and Postgres API' })
-})
-
-app.listen(port, () => {
-	console.log(`App running on port ${port}.`)
-})
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public-flutter')));
 
 app.get('/users', db.getUsers)
 app.get('/users/:id', db.getUserById)
