@@ -76,6 +76,17 @@ const getUserById = (request, response) => {
   })
 }
 
+const getTasksByUser = (request, respone) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('SELECT * FROM tasks WHERE user_id == $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
 // routes for POST endpoint
 const createUser = (request, response) => {
   const { name, email } = request.body
@@ -304,6 +315,7 @@ module.exports = {
   deleteUser,
   getTasks,
   getTaskById,
+  getTasksByUser,
   getSubTaskById,
   createTask,
   updateTask,
