@@ -9,7 +9,7 @@ const db = require('./queries')
 
 var app = express();
 
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -20,7 +20,7 @@ app.get('/', (request, response) => {
 	response.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
-app.listen(port, () => {
+let server = app.listen(port, () => {
 	console.log(`App running on port ${port}.`)
 })
 
@@ -38,3 +38,5 @@ app.get('/tasks/:id/subtasks', db.getSubTaskById)
 app.post('/tasks', db.createTask)
 app.put('/tasks/:id', db.updateTask)
 app.delete('/tasks/:id', db.deleteTask)
+
+module.exports = { app, server };
