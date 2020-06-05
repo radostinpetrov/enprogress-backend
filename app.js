@@ -20,7 +20,7 @@ app.get('/', (request, response) => {
 	response.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
-app.listen(port, () => {
+let server = app.listen(port, () => {
 	console.log(`App running on port ${port}.`)
 })
 
@@ -39,4 +39,4 @@ app.post('/tasks', db.createTask)
 app.put('/tasks/:id', db.updateTask)
 app.delete('/tasks/:id', db.deleteTask)
 
-module.exports = app;
+module.exports = { app, server };

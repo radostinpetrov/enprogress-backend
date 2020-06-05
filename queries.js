@@ -319,5 +319,6 @@ module.exports = {
   getSubTaskById,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  pool
 }

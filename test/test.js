@@ -2,6 +2,7 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../app');
 let should = chai.should();
+let db = require('../queries')
 
 chai.use(chaiHttp);
 
@@ -10,7 +11,7 @@ describe('Users', () => {
 
   describe('/GET users', () => {
     it('it should GET all the users', (done) => {
-      chai.request(server)
+      chai.request(server.app)
         .get('/users')
         .end((err, res) => {
           res.should.have.status(200);
@@ -26,7 +27,7 @@ describe('Users', () => {
       let user = {
         name: "JoeExotic",
       }
-      chai.request(server)
+      chai.request(server.app)
         .post('/users')
         .send(user)
         .end((err, res) => {
@@ -42,7 +43,7 @@ describe('Users', () => {
         name: "JoeExotic",
         email: "joe@gmail.com"
       }
-      chai.request(server)
+      chai.request(server.app)
         .post('/users')
         .send(user)
         .end((err, res) => {
@@ -62,7 +63,7 @@ describe('Users', () => {
         name: "JoeExotic",
         email: "joe@gmail.com"
       }
-      chai.request(server)
+      chai.request(server.app)
         .get('/users/' + insertedUserId)
         .end((err, res) => {
           res.should.have.status(200);
@@ -80,7 +81,7 @@ describe('Users', () => {
         name: "JoeExotic",
         email: "joe@gmail.com"
       }
-      chai.request(server)
+      chai.request(server.app)
         .put('/users/' + insertedUserId)
         .send(user)
         .end((err, res) => {
@@ -95,7 +96,7 @@ describe('Users', () => {
 
   describe('/DELETE/:id user', () => {
     it('it should DELETE a user by the given id', (done) => {
-      chai.request(server)
+      chai.request(server.app)
         .delete('/users/' + insertedUserId)
         .end((err, res) => {
           res.should.have.status(200);
@@ -114,7 +115,7 @@ describe('Tasks', () => {
 
   describe('/GET tasks', () => {
     it('it should GET all the tasks', (done) => {
-      chai.request(server)
+      chai.request(server.app)
         .get('/tasks')
         .end((err, res) => {
           res.should.have.status(200);
@@ -132,7 +133,7 @@ describe('Tasks', () => {
         subtasks: ['Introduction', 'Content', 'Conclusion'],
         subtaskPercentages: [20, 60, 20]
       }
-      chai.request(server)
+      chai.request(server.app)
         .post('/tasks')
         .send(task)
         .end((err, res) => {
@@ -150,7 +151,7 @@ describe('Tasks', () => {
         subtasks: ['Introduction', 'Content', 'Conclusion'],
         subtaskPercentages: [20, 60, 20]
       }
-      chai.request(server)
+      chai.request(server.app)
         .post('/tasks')
         .send(task)
         .end((err, res) => {
@@ -166,7 +167,7 @@ describe('Tasks', () => {
 
   describe('/GET/:id task', () => {
     it('it should GET a task by the given id', (done) => {
-      chai.request(server)
+      chai.request(server.app)
         .get('/tasks/' + insertedTaskId)
         .end((err, res) => {
           res.should.have.status(200);
@@ -186,7 +187,7 @@ describe('Tasks', () => {
         subtasks: ['Introduction', 'Content', 'Conclusion'],
         subtaskPercentages: [20, 50, 30]
       }
-      chai.request(server)
+      chai.request(server.app)
         .put('/tasks/' + insertedTaskId)
         .send(task)
         .end((err, res) => {
@@ -201,7 +202,7 @@ describe('Tasks', () => {
 
   describe('/DELETE/:id task', () => {
     it('it should DELETE a task by the given id', (done) => {
-      chai.request(server)
+      chai.request(server.app)
         .delete('/tasks/' + insertedTaskId)
         .end((err, res) => {
           res.should.have.status(200);
@@ -213,4 +214,9 @@ describe('Tasks', () => {
     })
   })
 
+
+  after(() => {
+    db.pool.end().then(console.log("connection to db closed"));
+    server.server.close();
+  })
 });
