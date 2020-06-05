@@ -19,6 +19,7 @@ build_docker_image_job:
 test_job:
   stage: test
   script:
+    - killall -9 node
     - npm i
     - npm test
 

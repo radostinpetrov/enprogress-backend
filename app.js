@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const port = 8000;
+const port = 3000;
 
 const db = require('./queries')
 
