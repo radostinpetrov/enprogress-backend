@@ -19,7 +19,7 @@ build_docker_image_job:
 test_job:
   stage: test
   script:
-    - killall -9 node
+    - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
     - npm i
     - npm test
 
