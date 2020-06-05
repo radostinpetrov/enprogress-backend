@@ -40,7 +40,7 @@ function validateUser(user, response) {
 function validateTask(task, response) {
   const result = Joi.validate(task, taskSchema)
   if (result.error) {
-    response.status(400).send(result.error.details[0].message)
+    response.status(400).send({ "error": result.error.details[0].message })
   }
 
   // TODO CHECK SUM (PERCENTAGES) === 100
@@ -50,7 +50,7 @@ function validateTask(task, response) {
 function validateSubtask(task, response) {
   const result = Joi.validate(task, subtaskSchema)
   if (result.error) {
-    response.status(400).send(result.error.details[0].message)
+    response.status(400).send({ "error": result.error.details[0].message })
   }
   return (result.error === null);
 }
@@ -211,7 +211,7 @@ const createTask = (request, response) => {
         })
     }
 
-    response.status(201).send(`Task added with ID: ${insertedId}`)
+    response.status(200).send({ message: 'Task successfully created!', id: insertedId })
   })
 }
 
@@ -288,7 +288,7 @@ const updateTask = (request, response) => {
         }
       )
 
-      response.status(200).send(`Task modified with ID: ${id}`)
+      response.status(200).send({ message: 'Task successfully modified!', id: id })
     }
   )
 }
@@ -302,7 +302,7 @@ const deleteTask = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(200).send(`Task deleted with ID: ${id}`)
+    response.status(200).send({ message: 'Task successfully deleted!', id: id })
   })
 }
 
