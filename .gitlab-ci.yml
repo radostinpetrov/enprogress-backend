@@ -2,6 +2,7 @@ image: $DOCKER_IMAGE:latest
 
 stages:
   - build_docker_image
+  - test
   - vm_deploy
   - heroku_deploy
 
@@ -14,6 +15,12 @@ build_docker_image_job:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
+
+test_job:
+  stage: test
+  script:
+    - npm i
+    - npm test
 
 vm_deploy_job:
   stage: vm_deploy
