@@ -4,7 +4,7 @@
   "description": "EnProgress App back-end built in Node.js and Express.",
   "scripts": {
     "start": "node ./bin/www",
-    "test": "mocha --timeout 10000"
+    "test": "mocha --exit"
   },
   "repository": {
     "type": "git",
