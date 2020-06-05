@@ -15,7 +15,7 @@ const taskSchema = {
 }
 
 const subtaskSchema = {
-  name: Joi.string().alphanum().min(3).max(100).required(),
+  name: Joi.string().min(3).max(100).required(),
   percentage: Joi.number().integer().min(0).max(100).required(),
   ordering: Joi.number().integer().min(0).required(),
   fk_task_id: Joi.number().integer().min(1).required(),
