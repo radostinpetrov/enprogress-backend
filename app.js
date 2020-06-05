@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const port = 3000;
+const port = 8000;
 
 const db = require('./queries')
 
@@ -38,3 +38,5 @@ app.get('/tasks/:id/subtasks', db.getSubTaskById)
 app.post('/tasks', db.createTask)
 app.put('/tasks/:id', db.updateTask)
 app.delete('/tasks/:id', db.deleteTask)
+
+module.exports = app;

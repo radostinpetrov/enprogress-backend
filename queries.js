@@ -21,7 +21,7 @@ const subtaskSchema = {
   fk_task_id: Joi.number().integer().min(1).required(),
 }
 
-const userSchema =  {
+const userSchema = {
   name: Joi.string().alphanum().min(1).max(50).required(),
   email: Joi.string().email().max(256).required()
 }
@@ -29,7 +29,7 @@ const userSchema =  {
 function validateUser(user, response) {
   const result = Joi.validate(user, userSchema)
   if (result.error) {
-    response.status(400).send(result.error.details[0].message)
+    response.status(400).send({ "error": result.error.details[0].message })
   }
 
   return (result.error === null);
@@ -92,11 +92,11 @@ const createUser = (request, response) => {
   const { name, email } = request.body
   if (!(validateUser(request.body, response))) return;
 
-  pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
+  pool.query('INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id', [name, email], (error, results) => {
     if (error) {
       throw error
     }
-    response.status(201).send(`User added with ID: ${results.insertId}`)
+    response.status(200).send({ message: 'User successfully inserted!', id: results.rows[0].id })
   })
 }
 
@@ -112,7 +112,7 @@ const updateUser = (request, response) => {
       if (error) {
         throw error
       }
-      response.status(200).send(`User modified with ID: ${id}`)
+      response.status(200).send({ message: 'User successfully modified!', id: id })
     }
   )
 }
@@ -125,7 +125,7 @@ const deleteUser = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(200).send(`User deleted with ID: ${id}`)
+    response.status(200).send({ message: 'User successfully deleted!', id: id })
   })
 }
 
