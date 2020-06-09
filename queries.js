@@ -107,14 +107,14 @@ const updateUser = (request, response) => {
   const { name, email } = request.body
 
   pool.query(
-      'UPDATE users SET name = $1, email = $2 WHERE id = $3',
-      [name, email, id],
-      (error, results) => {
-        if (error) {
-          throw error
-        }
-        response.status(200).send({ message: 'User successfully modified!', id: id })
+    'UPDATE users SET name = $1, email = $2 WHERE id = $3',
+    [name, email, id],
+    (error, results) => {
+      if (error) {
+        throw error
       }
+      response.status(200).send({ message: 'User successfully modified!', id: id })
+    }
   )
 }
 
@@ -184,7 +184,7 @@ const getSubTaskById = (request, response) => {
 const createTask = (request, response) => {
 
   // Extract data and validate
-  const { name, percentage, subtasks, subtaskPercentages, deadline} = request.body
+  const { name, percentage, deadline, subtasks, subtaskPercentages } = request.body
   if (!(validateTask(request.body, response))) return;
 
 
@@ -203,13 +203,13 @@ const createTask = (request, response) => {
       if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: insertedId }, response))) return;
 
       pool.query(
-          'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
-          [subtask, subtaskPercentage, i, insertedId],
-          (error, results) => {
-            if (error) {
-              throw error
-            }
-          })
+        'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
+        [subtask, subtaskPercentage, i, insertedId],
+        (error, results) => {
+          if (error) {
+            throw error
+          }
+        })
     }
 
     response.status(200).send({ message: 'Task successfully created!', id: insertedId })
@@ -222,75 +222,75 @@ const updateTask = (request, response) => {
 
   // Extract data and validate
   const id = parseInt(request.params.id)
-  const { name, percentage, subtasks, subtaskPercentages, deadline} = request.body
+  const { name, percentage, subtasks, subtaskPercentages, deadline } = request.body
   if (!(validateTask(request.body, response))) return;
 
 
   // Update main task
   pool.query(
-      'UPDATE tasks SET name = $1, percentage = $2, deadline = $3 WHERE id = $4',
-      [name, percentage, deadline, id],
-      (error, results) => {
-        if (error) {
-          throw error
-        }
-
-        // Get old subtasks
-        pool.query(
-            'SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY ordering ASC',
-            [id],
-            (error, subTaskResults) => {
-              if (error) {
-                throw error
-              }
-
-              for (var i = 0; i < subtasks.length; i++) {
-
-                // Extract subtask data and validate
-                const subtask = subtasks[i];
-                const subtaskPercentage = subtaskPercentages[i]
-                if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: id }, response))) return;
-
-                if (i < subTaskResults.rowCount) {
-
-                  // Update old subtasks
-                  pool.query(
-                      'UPDATE subtasks SET percentage = $1 WHERE name = $2 ',
-                      [subtaskPercentage, subTaskResults.rows[i].name],
-                      (error, results) => {
-                        if (error) {
-                          throw error
-                        }
-                      })
-
-                  pool.query(
-                      'UPDATE subtasks SET name = $1 WHERE name = $2',
-                      [subtask, subTaskResults.rows[i].name],
-                      (error) => {
-                        if (error) {
-                          throw error
-                        }
-                      }
-                  )
-                } else {
-
-                  // Insert new subtasks
-                  pool.query(
-                      'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
-                      [subtask, subtaskPercentage, i, id],
-                      (error, results) => {
-                        if (error) {
-                          console.log("hyaaaaa")
-                          throw error
-                        }
-                      })
-                }
-              }
-            }
-        )
-
-        response.status(200).send({ message: 'Task successfully modified!', id: id })
+    'UPDATE tasks SET name = $1, percentage = $2, deadline = $3 WHERE id = $4',
+    [name, percentage, deadline, id],
+    (error, results) => {
+      if (error) {
+        throw error
       }
+
+      // Get old subtasks
+      pool.query(
+        'SELECT * FROM subtasks WHERE fk_task_id = $1 ORDER BY ordering ASC',
+        [id],
+        (error, subTaskResults) => {
+          if (error) {
+            throw error
+          }
+
+          for (var i = 0; i < subtasks.length; i++) {
+
+            // Extract subtask data and validate
+            const subtask = subtasks[i];
+            const subtaskPercentage = subtaskPercentages[i]
+            if (!(validateSubtask({ name: subtask, percentage: subtaskPercentage, ordering: i, fk_task_id: id }, response))) return;
+
+            if (i < subTaskResults.rowCount) {
+
+              // Update old subtasks
+              pool.query(
+                'UPDATE subtasks SET percentage = $1 WHERE name = $2 ',
+                [subtaskPercentage, subTaskResults.rows[i].name],
+                (error, results) => {
+                  if (error) {
+                    throw error
+                  }
+                })
+
+              pool.query(
+                'UPDATE subtasks SET name = $1 WHERE name = $2',
+                [subtask, subTaskResults.rows[i].name],
+                (error) => {
+                  if (error) {
+                    throw error
+                  }
+                }
+              )
+            } else {
+
+              // Insert new subtasks
+              pool.query(
+                'INSERT INTO subtasks (name, percentage, ordering, fk_task_id) VALUES ($1, $2, $3, $4)',
+                [subtask, subtaskPercentage, i, id],
+                (error, results) => {
+                  if (error) {
+                    console.log("hyaaaaa")
+                    throw error
+                  }
+                })
+            }
+          }
+        }
+      )
+
+      response.status(200).send({ message: 'Task successfully modified!', id: id })
+    }
   )
 }
 
