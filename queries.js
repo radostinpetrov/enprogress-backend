@@ -10,9 +10,9 @@ const Joi = require('joi')
 const taskSchema = {
   name: Joi.string().min(3).max(50).required(),
   percentage: Joi.number().integer().min(0).max(100).required(),
+  deadline: Joi.date(),
   subtasks: Joi.array().items(Joi.string().min(3).max(50).required()),
-  subtaskPercentages: Joi.array().items(Joi.number().integer().min(0).max(100).required()),
-  deadline: Joi.date()
+  subtaskPercentages: Joi.array().items(Joi.number().integer().min(0).max(100).required())
 }
 
 const subtaskSchema = {
