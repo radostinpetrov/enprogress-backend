@@ -145,6 +145,24 @@ describe('Tasks', () => {
                 });
         });
 
+        it('it should not POST a task where subtask percentages do not sum to 100', (done) => {
+            let task = {
+                name: 'Essay',
+                percentage: 30,
+                subtasks: ['Introduction', 'Content', 'Conclusion'],
+                subtaskPercentages: [20, 60, 10]
+            }
+            chai.request(server.app)
+                .post('/tasks')
+                .send(task)
+                .end((err, res) = > {
+                    res.should.have.status(400);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('error').eql('Subtask percentages must sum to 100!');
+                    done();
+                });
+        });
+
         it('it should POST a task ', (done) => {
             let task = {
                 name: 'Essay',

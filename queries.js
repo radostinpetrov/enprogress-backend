@@ -24,7 +24,8 @@ const subtaskSchema = {
 
 const userSchema = {
   name: Joi.string().alphanum().min(1).max(50).required(),
-  email: Joi.string().email().max(256).required()
+  email: Joi.string().email().max(256).required(),
+  points: Joi.number().integer()
 }
 
 function validateUser(user, response) {
@@ -39,13 +40,24 @@ function validateUser(user, response) {
 
 // Data validation functions (return true if data valid)
 function validateTask(task, response) {
+
   const result = Joi.validate(task, taskSchema)
   if (result.error) {
     response.status(400).send({ "error": result.error.details[0].message })
+    return false;
   }
 
-  // TODO CHECK SUM (PERCENTAGES) === 100
-  return (result.error === null);
+  var totalPercentage = 0
+  for (var i = 0; i < task.subtaskPercentages.length; i++) {
+    totalPercentage += task.subtaskPercentages[i]
+  }
+
+  if (totalPercentage != 100) {
+    response.status(400).send({ "error": "Subtask percentages must sum to 100!" })
+    return false;
+  }
+
+  return true;
 }
 
 function validateSubtask(task, response) {

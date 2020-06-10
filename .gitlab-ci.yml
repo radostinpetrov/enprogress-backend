@@ -8,6 +8,7 @@ stages:
 
 variables:
   DOCKER_IMAGE: gitlab.doc.ic.ac.uk:4567/g1927129/enprogress-backend
+  run_test: 'false'
 
 build_docker_image_job:
   stage: build_docker_image
@@ -22,6 +23,9 @@ test_job:
     - if screen -ls | grep "EnProgress" ; then screen -XS EnProgress quit ; fi
     - npm i
     - npm test
+  except:
+    variables:
+      - $run_test != "true"
 
 vm_deploy_job:
   stage: vm_deploy
