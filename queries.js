@@ -130,6 +130,24 @@ const updateUser = (request, response) => {
   )
 }
 
+//routes for PATCH endpoint
+const patchPointsUser = (request, response) => {
+  const id = parseInt(request.params.id)
+  const {points} = request.body
+  pool.query(
+      'UPDATE users SET points = points + $1 WHERE id = $2',
+      [points, id],
+      (error, results) {
+        if (error) {
+          throw error
+        }
+        reesponse.status(200).send({message: 'User Points successfully'
+              + ' updated!', id: id})
+  }
+
+  )
+}
+
 // routes for DELETE endpoint
 const deleteUser = (request, response) => {
   const id = parseInt(request.params.id)
@@ -325,6 +343,7 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
+  patchPointsUser,
   deleteUser,
   getTasks,
   getTaskById,
