@@ -58,12 +58,24 @@ function validateSubtask(task, response) {
 
 // routes for GET endpoint
 const getUsers = (request, response) => {
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
+
+  if (request.query.email) {
+    const email = request.query.email
+    pool.query('SELECT * FROM users WHERE email = $1 ORDER BY id ASC', [email], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
+  } else {
+    pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
+  }
+
 }
 
 const getUserById = (request, response) => {
@@ -135,12 +147,24 @@ const deleteUser = (request, response) => {
 
 // Routes for GET reqs
 const getTasks = (request, response) => {
-  pool.query('SELECT * FROM tasks ORDER by id ASC', (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
+
+  if (request.query.fk_user_id) {
+    const fk_user_id = parseInt(request.query.fk_user_id);
+    pool.query('SELECT * FROM tasks WHERE fk_user_id = $1 ORDER by id ASC', [fk_user_id], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
+  } else {
+    pool.query('SELECT * FROM tasks ORDER by id ASC', (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
+  }
+
 }
 
 const getTaskById = (request, response) => {
@@ -184,11 +208,11 @@ const getSubTaskById = (request, response) => {
 const createTask = (request, response) => {
 
   // Extract data and validate
-  const { name, percentage, deadline, subtasks, subtaskPercentages } = request.body
+  const { name, percentage, deadline, fk_user_id, subtasks, subtaskPercentages } = request.body
   if (!(validateTask(request.body, response))) return;
 
 
-  pool.query('INSERT INTO tasks (name, percentage, deadline) VALUES ($1, $2, $3) RETURNING id', [name, percentage, deadline], (error, results) => {
+  pool.query('INSERT INTO tasks (name, percentage, deadline, fk_user_id) VALUES ($1, $2, $3, $4) RETURNING id', [name, percentage, deadline, fk_user_id], (error, results) => {
     if (error) {
       throw error
     }
@@ -280,7 +304,6 @@ const updateTask = (request, response) => {
                 [subtask, subtaskPercentage, i, id],
                 (error, results) => {
                   if (error) {
-                    console.log("hyaaaaa")
                     throw error
                   }
                 })
