@@ -126,118 +126,118 @@ describe('Tasks', () => {
         });
     });
 
-    describe('/POST tasks', () => {
-        it('it should not POST a task without a percentage', (done) => {
-            let task = {
-                name: 'Essay',
-                deadline: "2020-06-09",
-                subtasks: ['Introduction', 'Content', 'Conclusion'],
-                subtaskPercentages: [20, 60, 20]
-            }
-            chai.request(server.app)
-                .post('/tasks')
-                .send(task)
-                .end((err, res) => {
-                    res.should.have.status(400);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('error').eql('"percentage" is required');
-                    done();
-                });
-        });
+    // describe('/POST tasks', () => {
+    //     it('it should not POST a task without a percentage', (done) => {
+    //         let task = {
+    //             name: 'Essay',
+    //             deadline: "2020-06-09",
+    //             subtasks: ['Introduction', 'Content', 'Conclusion'],
+    //             subtaskPercentages: [20, 60, 20]
+    //         }
+    //         chai.request(server.app)
+    //             .post('/tasks')
+    //             .send(task)
+    //             .end((err, res) => {
+    //                 res.should.have.status(400);
+    //                 res.body.should.be.a('object');
+    //                 res.body.should.have.property('error').eql('"percentage" is required');
+    //                 done();
+    //             });
+    //     });
 
-        it('it should not POST a task where subtask percentages do not sum to 100', (done) => {
-            let task = {
-                name: 'Essay',
-                percentage: 30,
-                subtasks: ['Introduction', 'Content', 'Conclusion'],
-                subtaskPercentages: [20, 60, 10]
-            }
-            chai.request(server.app)
-                .post('/tasks')
-                .send(task)
-                .end((err, res) = > {
-                    res.should.have.status(400);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('error').eql('Subtask percentages must sum to 100!');
-                    done();
-                });
-        });
-
-        it('it should POST a task ', (done) => {
-            let task = {
-                name: 'Essay',
-                percentage: 0,
-                deadline: "2020-06-09",
-                subtasks: ['Introduction', 'Content', 'Conclusion'],
-                subtaskPercentages: [20, 60, 20]
-            }
-            chai.request(server.app)
-                .post('/tasks')
-                .send(task)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('id');
-                    insertedTaskId = res.body.id;
-                    res.body.should.have.property('message').eql('Task successfully created!')
-                    done();
-                });
-        });
+    it('it should not POST a task where subtask percentages do not sum to 100', (done) => {
+        let task = {
+            name: 'Essay',
+            percentage: 30,
+            subtasks: ['Introduction', 'Content', 'Conclusion'],
+            subtaskPercentages: [20, 60, 10]
+        }
+        chai.request(server.app)
+            .post('/tasks')
+            .send(task)
+            .end((err, res) = > {
+                res.should.have.status(400);
+                res.body.should.be.a('object');
+                res.body.should.have.property('error').eql('Subtask percentages must sum to 100!');
+                done();
+            });
     });
 
-    describe('/GET/:id task', () => {
-        it('it should GET a task by the given id', (done) => {
-            chai.request(server.app)
-                .get('/tasks/' + insertedTaskId)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body[0].should.be.a('object');
-                    res.body[0].should.have.property('id').eql(insertedTaskId);
-                    res.body[0].should.have.property('percentage');
-                    done();
-                });
-        })
-    })
+    it('it should POST a task ', (done) => {
+        let task = {
+            name: 'Essay',
+            percentage: 0,
+            deadline: "2020-06-09",
+            subtasks: ['Introduction', 'Content', 'Conclusion'],
+            subtaskPercentages: [20, 60, 20]
+        }
+        chai.request(server.app)
+            .post('/tasks')
+            .send(task)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('id');
+                insertedTaskId = res.body.id;
+                res.body.should.have.property('message').eql('Task successfully created!')
+                done();
+            });
+    });
+});
 
-    describe('/PUT/:id task', () => {
-        it('it should UPDATE a task by the given id', (done) => {
-            let task = {
-                name: 'Essay',
-                percentage: 0,
-                deadline: "2020-06-09",
-                subtasks: ['Introduction', 'Content', 'Conclusion'],
-                subtaskPercentages: [20, 50, 30]
-            }
-            chai.request(server.app)
-                .put('/tasks/' + insertedTaskId)
-                .send(task)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('id').eql(insertedTaskId);
-                    res.body.should.have.property('message').eql('Task successfully modified!')
-                    done();
-                });
-        })
+describe('/GET/:id task', () => {
+    it('it should GET a task by the given id', (done) => {
+        chai.request(server.app)
+            .get('/tasks/' + insertedTaskId)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body[0].should.be.a('object');
+                res.body[0].should.have.property('id').eql(insertedTaskId);
+                res.body[0].should.have.property('percentage');
+                done();
+            });
     })
+})
 
-    describe('/DELETE/:id task', () => {
-        it('it should DELETE a task by the given id', (done) => {
-            chai.request(server.app)
-                .delete('/tasks/' + insertedTaskId)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('id').eql(insertedTaskId);
-                    res.body.should.have.property('message').eql('Task successfully deleted!')
-                    done();
-                });
-        })
+describe('/PUT/:id task', () => {
+    it('it should UPDATE a task by the given id', (done) => {
+        let task = {
+            name: 'Essay',
+            percentage: 0,
+            deadline: "2020-06-09",
+            subtasks: ['Introduction', 'Content', 'Conclusion'],
+            subtaskPercentages: [20, 50, 30]
+        }
+        chai.request(server.app)
+            .put('/tasks/' + insertedTaskId)
+            .send(task)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('id').eql(insertedTaskId);
+                res.body.should.have.property('message').eql('Task successfully modified!')
+                done();
+            });
     })
+})
 
-
-    after(() => {
-        db.pool.end().then(console.log("connection to db closed"));
-        server.server.close();
+describe('/DELETE/:id task', () => {
+    it('it should DELETE a task by the given id', (done) => {
+        chai.request(server.app)
+            .delete('/tasks/' + insertedTaskId)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('id').eql(insertedTaskId);
+                res.body.should.have.property('message').eql('Task successfully deleted!')
+                done();
+            });
     })
+})
+
+
+after(() => {
+    db.pool.end().then(console.log("connection to db closed"));
+    server.server.close();
+})
 });

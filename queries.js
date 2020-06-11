@@ -11,6 +11,7 @@ const taskSchema = {
   name: Joi.string().min(3).max(50).required(),
   percentage: Joi.number().integer().min(0).max(100).required(),
   deadline: Joi.date(),
+  fk_user_id: Joi.number().integer().min(0).required(),
   subtasks: Joi.array().items(Joi.string().min(3).max(50).required()),
   subtaskPercentages: Joi.array().items(Joi.number().integer().min(0).max(100).required())
 }
@@ -44,20 +45,19 @@ function validateTask(task, response) {
   const result = Joi.validate(task, taskSchema)
   if (result.error) {
     response.status(400).send({ "error": result.error.details[0].message })
-    return false;
   }
 
-  var totalPercentage = 0
-  for (var i = 0; i < task.subtaskPercentages.length; i++) {
-    totalPercentage += task.subtaskPercentages[i]
-  }
+  // var totalPercentage = 0
+  // for (var i = 0; i < task.subtaskPercentages.length; i++) {
+  //   totalPercentage += task.subtaskPercentages[i]
+  // }
 
-  if (totalPercentage != 100) {
-    response.status(400).send({ "error": "Subtask percentages must sum to 100!" })
-    return false;
-  }
+  // if (totalPercentage != 100) {
+  //   response.status(400).send({ "error": "Subtask percentages must sum to 100!" })
+  //   return false;
+  // }
 
-  return true;
+  return (result.error === null);
 }
 
 function validateSubtask(task, response) {
@@ -239,6 +239,7 @@ const getSubTaskById = (request, response) => {
 const createTask = (request, response) => {
 
   // Extract data and validate
+  console.log(request.body)
   const { name, percentage, deadline, fk_user_id, subtasks, subtaskPercentages } = request.body
   if (!(validateTask(request.body, response))) return;
 
