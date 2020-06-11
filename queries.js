@@ -153,7 +153,7 @@ const patchPointsUser = (request, response) => {
       if (error) {
         throw error
       }
-      reesponse.status(200).send({
+      response.status(200).send({
         message: 'User Points successfully'
           + ' updated!', id: id
       })
