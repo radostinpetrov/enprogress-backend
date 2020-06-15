@@ -15,11 +15,11 @@ const RESOURCES = {
 "assets/images/icons8-princess-96.png": "93e7e06b716ddbe03fa503d68bb78632",
 "assets/images/icons8-peter-the-great-96.png": "e98dce1775cfbbe2f843cc50c17971b8",
 "assets/images/icons8-user-100.png": "5c3611a45870d722f200c51a7dbb4c37",
-"assets/NOTICES": "108d0a1640e6b622b04c79e5a1de9f51",
+"assets/NOTICES": "d4bc8544484850bc7813c3ae382d09fd",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "115e937bb829a890521f72d2e664b632",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
-"main.dart.js": "671aa9dffc3aff66e6c360842721c4b0"
+"main.dart.js": "9629f696b5fd36070c5a12b7c46da245"
 };
 
 // The application shell files that are downloaded before a service worker can
@@ -28,7 +28,7 @@ const CORE = [
   "/",
 "main.dart.js",
 "index.html",
-"assets/LICENSE",
+"assets/NOTICES",
 "assets/AssetManifest.json",
 "assets/FontManifest.json"];
 
@@ -157,8 +157,8 @@ async function downloadOffline() {
   }
   for (var resourceKey in Object.keys(RESOURCES)) {
     if (!currentContent[resourceKey]) {
-      resources.add(resourceKey);
+      resources.push(resourceKey);
     }
   }
-  return Cache.addAll(resources);
+  return contentCache.addAll(resources);
 }
