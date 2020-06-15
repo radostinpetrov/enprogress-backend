@@ -5,6 +5,7 @@ const pool = new Pool({
 })
 
 const Joi = require('joi')
+const { response } = require('express')
 
 // Schemas for DB
 const taskSchema = {
@@ -26,7 +27,15 @@ const subtaskSchema = {
 const userSchema = {
   name: Joi.string().alphanum().min(1).max(50).required(),
   email: Joi.string().email().max(256).required(),
-  points: Joi.number().integer()
+  points: Joi.number().integer(),
+  fcm_token: Joi.string()
+}
+
+const workModeRequestSchema = {
+  fk_sender_id: Joi.number().min(1).integer().required(),
+  fk_recipient_id: Joi.number().min(1).integer().required(),
+  start_time: Joi.date().required(),
+  duration: Joi.number().min(0).required()
 }
 
 function validateUser(user, response) {
@@ -62,6 +71,15 @@ function validateTask(task, response) {
 
 function validateSubtask(task, response) {
   const result = Joi.validate(task, subtaskSchema)
+  if (result.error) {
+    response.status(400).send({ "error": result.error.details[0].message })
+  }
+  return (result.error === null);
+}
+
+
+function validateWorkModeRequests(task, response) {
+  const result = Joi.validate(task, workModeRequestSchema)
   if (result.error) {
     response.status(400).send({ "error": result.error.details[0].message })
   }
@@ -381,6 +399,33 @@ const deleteTask = (request, response) => {
 }
 
 
+const getWorkModeRequests = (request, response) => {
+  pool.query(
+    'SELECT * FROM workmoderequests ORDER BY start_time',
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    }
+  )
+}
+
+const createWorkModeRequest = (request, response) => {
+  const { fk_sender_id, fk_recipient_id, start_time, duration } = request.body
+  if (!(validateWorkModeRequests(request.body, response))) return;
+
+  pool.query(
+    'INSERT INTO workmoderequests (fk_sender_id, fk_recipient_id, start_time, duration) VALUES ($1, $2, $3, $4) RETURNING id',
+    [fk_sender_id, fk_recipient_id, start_time, duration],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send({ message: 'WorkModeRequest successfully inserted!', id: results.rows[0].id })
+    })
+}
+
 module.exports = {
   getUsers,
   getUserById,
@@ -395,5 +440,7 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
+  getWorkModeRequests,
+  createWorkModeRequest,
   pool
 }

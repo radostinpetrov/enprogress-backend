@@ -25,7 +25,6 @@ let server = app.listen(port, () => {
 	console.log(`App running on port ${port}.`)
 })
 
-
 app.get('/users', db.getUsers)
 app.get('/users/:id', db.getUserById)
 app.get('/users/tasks/:id', db.getTasksByUser)
@@ -40,5 +39,8 @@ app.get('/tasks/:id/subtasks', db.getSubTaskById)
 app.post('/tasks', db.createTask)
 app.put('/tasks/:id', db.updateTask)
 app.delete('/tasks/:id', db.deleteTask)
+
+app.get('/workmoderequests', db.getWorkModeRequests)
+app.post('/workmoderequests', db.createWorkModeRequest)
 
 module.exports = { app, server };
