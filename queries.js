@@ -411,6 +411,20 @@ const getWorkModeRequests = (request, response) => {
   )
 }
 
+const getWorkModeRequestById = (request, response) => {
+  const id = parseInt(response.params.id)
+  pool.query(
+    'SELECT * FROM workmoderequests WHERE id = $1',
+    [id],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    }
+  )
+}
+
 const createWorkModeRequest = (request, response) => {
   const { fk_sender_id, fk_recipient_id, start_time, duration } = request.body
   if (!(validateWorkModeRequests(request.body, response))) return;
@@ -441,6 +455,7 @@ module.exports = {
   updateTask,
   deleteTask,
   getWorkModeRequests,
+  getWorkModeRequestById,
   createWorkModeRequest,
   pool
 }

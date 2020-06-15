@@ -41,6 +41,7 @@ app.put('/tasks/:id', db.updateTask)
 app.delete('/tasks/:id', db.deleteTask)
 
 app.get('/workmoderequests', db.getWorkModeRequests)
+app.get('/workmoderequests/:id', db.getWorkModeRequestById)
 app.post('/workmoderequests', db.createWorkModeRequest)
 
 module.exports = { app, server };
