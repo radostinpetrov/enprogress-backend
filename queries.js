@@ -143,22 +143,40 @@ const updateUser = (request, response) => {
 }
 
 //routes for PATCH endpoint
-const patchPointsUser = (request, response) => {
+const patchUser = (request, response) => {
   const id = parseInt(request.params.id)
-  const { points } = request.body
-  pool.query(
-    'UPDATE users SET points = points + $1 WHERE id = $2',
-    [points, id],
-    (error, results) => {
-      if (error) {
-        throw error
+  const { points, fcm_token } = request.body
+  if (points) {
+    pool.query(
+      'UPDATE users SET points = points + $1 WHERE id = $2',
+      [points, id],
+      (error, results) => {
+        if (error) {
+          throw error
+        }
+        response.status(200).send({
+          message: 'User Points successfully'
+            + ' updated!', id: id
+        })
       }
-      response.status(200).send({
-        message: 'User Points successfully'
-          + ' updated!', id: id
-      })
-    }
-  )
+    )
+  } else if (fcm_token) {
+    pool.query(
+      'UPDATE users SET fcm_token = $1 WHERE id = $2',
+      [fcm_token, id],
+      (error, results) => {
+        if (error) {
+          throw error
+        }
+        response.status(200).send({
+          message: 'User FCM Token successfully updated!',
+          id: id
+        })
+      }
+    )
+  } else {
+    response.status(400).send({ "error": 'Please provide points or fcm_token to patch' })
+  }
 }
 
 // routes for DELETE endpoint
@@ -368,7 +386,7 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
-  patchPointsUser,
+  patchUser,
   deleteUser,
   getTasks,
   getTaskById,

@@ -32,7 +32,7 @@ app.get('/users/tasks/:id', db.getTasksByUser)
 app.post('/users', db.createUser)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
-app.patch('/users/:id', db.patchPointsUser)
+app.patch('/users/:id', db.patchUser)
 
 app.get('/tasks', db.getTasks)
 app.get('/tasks/:id', db.getTaskById)
