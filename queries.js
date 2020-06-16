@@ -412,7 +412,7 @@ const getWorkModeRequests = (request, response) => {
 }
 
 const getWorkModeRequestById = (request, response) => {
-  const id = parseInt(response.params.id)
+  const id = parseInt(request.params.id)
   pool.query(
     'SELECT * FROM workmoderequests WHERE id = $1',
     [id],
