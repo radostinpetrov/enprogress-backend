@@ -13,7 +13,7 @@ const taskSchema = {
   percentage: Joi.number().integer().min(0).max(100).required(),
   deadline: Joi.date(),
   fk_user_id: Joi.number().integer().min(0).required(),
-  subtasks: Joi.array().items(Joi.string().min(3).max(50).required()),
+  subtasks: Joi.array().items(Joi.string().min(1).max(50).required()),
   subtaskPercentages: Joi.array().items(Joi.number().integer().min(0).max(100).required())
 }
 
