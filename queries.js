@@ -425,6 +425,18 @@ const getWorkModeRequestById = (request, response) => {
   )
 }
 
+const deleteWorkModeRequestById = (request, response) => {
+  const id = parseInt(request.params.id)
+
+  pool.query('DELETE FROM workmoderequests WHERE id = $1', [id], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send({ message: 'WorkModeRequest successfully'
+          + ' deleted!', id: id })
+  })
+}
+
 const createWorkModeRequest = (request, response) => {
   const { fk_sender_id, fk_recipient_id, start_time, duration } = request.body
   if (!(validateWorkModeRequests(request.body, response))) return;
@@ -457,5 +469,6 @@ module.exports = {
   getWorkModeRequests,
   getWorkModeRequestById,
   createWorkModeRequest,
+  deleteWorkModeRequestById,
   pool
 }
