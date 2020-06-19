@@ -1,5 +1,5 @@
 const Pool = require('pg').Pool
-const connectionString = "postgresql://mh7618:lK2WvrCrkB@db.doc.ic.ac.uk:5432/mh7618?ssl=true"
+const connectionString = `postgresql://mh7618:${process.env.DBPASS}@db.doc.ic.ac.uk:5432/mh7618?ssl=true`
 const pool = new Pool({
   connectionString: connectionString,
 })
@@ -56,16 +56,6 @@ function validateTask(task, response) {
     response.status(400).send({ "error": result.error.details[0].message })
   }
 
-  // var totalPercentage = 0
-  // for (var i = 0; i < task.subtaskPercentages.length; i++) {
-  //   totalPercentage += task.subtaskPercentages[i]
-  // }
-
-  // if (totalPercentage != 100) {
-  //   response.status(400).send({ "error": "Subtask percentages must sum to 100!" })
-  //   return false;
-  // }
-
   return (result.error === null);
 }
 
@@ -78,8 +68,9 @@ function validateSubtask(task, response) {
 }
 
 
-function validateWorkModeRequests(task, response) {
-  const result = Joi.validate(task, workModeRequestSchema)
+function validateWorkModeRequests(workModeRequest, response) {
+  const result = Joi.validate(workModeRequest, workModeRequestSchema)
+  console.log(workModeRequest)
   if (result.error) {
     response.status(400).send({ "error": result.error.details[0].message })
   }
@@ -432,8 +423,10 @@ const deleteWorkModeRequestById = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(200).send({ message: 'WorkModeRequest successfully'
-          + ' deleted!', id: id })
+    response.status(200).send({
+      message: 'WorkModeRequest successfully'
+        + ' deleted!', id: id
+    })
   })
 }
 

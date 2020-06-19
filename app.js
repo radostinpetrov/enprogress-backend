@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+require('dotenv-safe').config()
 
 const port = process.env.PORT || 3000;
 
@@ -15,8 +16,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public-flutter')));
 
-console.log(process.env.PORT)
-console.log(process.env)
 app.get('/', (request, response) => {
 	response.json({ info: 'Node.js, Express, and Postgres API' })
 })
