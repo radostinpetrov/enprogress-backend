@@ -1,5 +1,6 @@
 const Pool = require('pg').Pool
-const connectionString = `postgresql://mh7618:${process.env.DBPASS}@db.doc.ic.ac.uk:5432/mh7618?ssl=true`
+require('dotenv-safe').config()
+const connectionString = `postgresql://${process.env.DBUNAME}:${process.env.DBPASS}@db.doc.ic.ac.uk:5432/mh7618?ssl=true`
 const pool = new Pool({
   connectionString: connectionString,
 })
